@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.jpe.pdi.btc.core;
+package br.jpe.pdi.btc.utils;
 
 import br.jpe.ipl.core.Image;
 import br.jpe.ipl.core.ImageLoader;
@@ -26,7 +26,7 @@ import java.io.InputStream;
 /**
  * File utils
  */
-public class Utils {
+public class Files {
 
     public final static String JPEG = "jpeg";
     public final static String JPG = "jpg";
@@ -57,7 +57,7 @@ public class Utils {
             return ImageLoader.fromFile(file).asOriginal();
         }
         // Get the image as a resource
-        InputStream resourceImg = Utils.class.getClassLoader().getResourceAsStream(filename);
+        InputStream resourceImg = Files.class.getClassLoader().getResourceAsStream(filename);
         if (resourceImg != null) {
             return ImageLoader.fromResources(filename).asOriginal();
         }

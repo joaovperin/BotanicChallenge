@@ -16,7 +16,6 @@
  */
 package br.jpe.pdi.btc.gui;
 
-import br.jpe.pdi.btc.utils.CustomOnChangeListener;
 import br.jpe.pdi.btc.core.UIController;
 
 /**
@@ -45,9 +44,11 @@ public class MainFrame extends javax.swing.JFrame {
         jButtonOpenFileBrowser = new javax.swing.JButton();
         jButtonGo = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        canvas = new java.awt.Canvas();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("BotanicChallenge");
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -55,18 +56,6 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         jTextFieldImageSelector.setToolTipText("Select a file...");
-        jTextFieldImageSelector.addInputMethodListener(new java.awt.event.InputMethodListener() {
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
-            }
-            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
-                jTextFieldImageSelectorTextChanged(evt);
-            }
-        });
-        jTextFieldImageSelector.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextFieldImageSelectorActionPerformed(evt);
-            }
-        });
 
         jLabelImage.setText("Image: ");
 
@@ -85,15 +74,23 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        canvas.setPreferredSize(new java.awt.Dimension(32767, 32767));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 502, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, 735, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -102,7 +99,7 @@ public class MainFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelImage)
@@ -111,9 +108,8 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonOpenFileBrowser, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonGo)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jButtonGo)))
+                .addGap(0, 12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -134,28 +130,20 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOpenFileBrowserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenFileBrowserActionPerformed
-        UIController.get().onClickOpenFileBrowser();
+        UIController.get().onClickOpenFileBrowser(jTextFieldImageSelector);
     }//GEN-LAST:event_jButtonOpenFileBrowserActionPerformed
 
     private void jButtonGoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGoActionPerformed
-        UIController.get().onClickGo();
+        UIController.get().onClickGo(jTextFieldImageSelector);
     }//GEN-LAST:event_jButtonGoActionPerformed
 
-    private void jTextFieldImageSelectorTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTextFieldImageSelectorTextChanged
-    }//GEN-LAST:event_jTextFieldImageSelectorTextChanged
-
-    private void jTextFieldImageSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldImageSelectorActionPerformed
-    }//GEN-LAST:event_jTextFieldImageSelectorActionPerformed
-
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        jTextFieldImageSelector.getDocument().addDocumentListener(
-                new CustomOnChangeListener(() -> UIController.get().onTextChanged(jTextFieldImageSelector.getText()))
-        );
-        jTextFieldImageSelector.setText("D:/Programacao/Projetos/x/BotanicChallenge/res/leaf_1.png"); // ChangeTo: System.getProperty("user.home")
-        //UIController.get().setCanvasRef(canvas);
+        jTextFieldImageSelector.setText(System.getProperty("user.home"));
+        UIController.get().setCanvasRef(canvas).renderImageOnCanvas(jTextFieldImageSelector);
     }//GEN-LAST:event_formWindowOpened
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Canvas canvas;
     private javax.swing.JButton jButtonGo;
     private javax.swing.JButton jButtonOpenFileBrowser;
     private javax.swing.JLabel jLabelImage;

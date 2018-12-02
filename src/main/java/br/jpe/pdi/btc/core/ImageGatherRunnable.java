@@ -16,6 +16,7 @@
  */
 package br.jpe.pdi.btc.core;
 
+import br.jpe.pdi.btc.utils.Files;
 import br.jpe.ipl.core.Image;
 import br.jpe.ipl.core.ImageBuilder;
 import br.jpe.ipl.core.ImageColor;
@@ -31,33 +32,23 @@ import java.util.Map;
 /**
  * An image info-gathering runnable
  */
-public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
+public class ImageGatherRunnable extends AsyncTask implements ImageInfoConstants {
 
     private final String filename;
-    private SucessCallback onSucessCallback;
-    private ErrorCallback onErrorCallback;
 
     public ImageGatherRunnable(String filename) {
         this.filename = filename;
     }
 
     @Override
-    public void run() {
-        try {
-            ImageInfo info = gatherInfo();
-            if (onSucessCallback != null) {
-                onSucessCallback.run(getReturnMessage(info));
-            }
-        } catch (Exception e) {
-            if (onErrorCallback != null) {
-                onErrorCallback.run(e);
-            }
-        }
+    public String runTask() throws Exception {
+        ImageInfo info = gatherInfo();
+        return getReturnMessage(info);
     }
 
     private ImageInfo gatherInfo() throws IOException {
         // Load image
-        Image imgOriginal = Utils.loadImage(filename);
+        Image imgOriginal = Files.loadImage(filename);
 
         // Minimum area to be considered a block
         final int MIN_AREA = 400;
@@ -117,16 +108,6 @@ public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
         sb.append("Numero de fungos: ").append(numFungos).append('\n');
         sb.append("Tratamento: ").append(getTratamento(numFungos)).append('\n');
         return sb.toString();
-    }
-
-    public final ImageGatherRunnable onSucessCallback(SucessCallback onSucessCallback) {
-        this.onSucessCallback = onSucessCallback;
-        return this;
-    }
-
-    public final ImageGatherRunnable onErrorCallback(ErrorCallback callback) {
-        this.onErrorCallback = callback;
-        return this;
     }
 
     private String getTratamento(int numFungos) {

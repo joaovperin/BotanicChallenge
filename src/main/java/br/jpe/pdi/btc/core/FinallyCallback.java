@@ -14,35 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.jpe.pdi.btc.utils;
-
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+package br.jpe.pdi.btc.core;
 
 /**
- * A custom On Change Event Listener
+ * Callback
  */
-public class CustomOnChangeListener implements DocumentListener {
+public interface FinallyCallback {
 
-    private final Runnable runnable;
-
-    public CustomOnChangeListener(Runnable runnable) {
-        this.runnable = runnable;
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        runnable.run();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        runnable.run();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        runnable.run();
-    }
+    public void run();
 
 }

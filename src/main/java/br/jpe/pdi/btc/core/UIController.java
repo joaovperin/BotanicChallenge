@@ -16,15 +16,18 @@
  */
 package br.jpe.pdi.btc.core;
 
+import br.jpe.pdi.btc.gui.MessageDialog;
+import br.jpe.pdi.btc.gui.LoadingBar;
+import br.jpe.pdi.btc.utils.Files;
 import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * UI Controller
@@ -33,42 +36,47 @@ public class UIController {
 
     private static UIController instance;
 
-    private String imageName;
     private Canvas canvas;
 
     private UIController() {
-        this.imageName = "";
     }
 
-    public final void onClickOpenFileBrowser() {
+    public final void onClickOpenFileBrowser(JTextField textField) {
+        // Create Filechooser
         JFileChooser jFileChooser = new javax.swing.JFileChooser();
         jFileChooser.setFileFilter(new ImageFilter());
         jFileChooser.setVisible(true);
-        jFileChooser.setCurrentDirectory(new File(imageName));
-
+        jFileChooser.setCurrentDirectory(new File(textField.getText()));
+        // Open file chooser
         int returnVal = jFileChooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            this.imageName = jFileChooser.getSelectedFile().toString();
-            if (this.canvas != null) {
-                drawImageOnCanvas();
-            }
+            textField.setText(jFileChooser.getSelectedFile().toString());
+            renderImageOnCanvas(textField);
         }
     }
 
-    public final void onClickGo() {
-        new Thread(new ImageGatherRunnable(imageName).onSucessCallback((String msg) -> {
-            JOptionPane.showMessageDialog(null, fmtMessage(msg), "Information!", JOptionPane.INFORMATION_MESSAGE);
+    public final void onClickGo(JTextField textField) {
+        LoadingBar.get().show(canvas);
+        new Thread(new ImageGatherRunnable(textField.getText()).onSucessCallback((SucessCallback<String>) (String data) -> {
+            MessageDialog.get().showInfo(fmtMessage(data));
         }).onErrorCallback((Exception err) -> {
-            JOptionPane.showMessageDialog(null, fmtError(err), "Error!", JOptionPane.ERROR_MESSAGE);
+            MessageDialog.get().showError(fmtError(err));
             err.printStackTrace(System.out);
+        }).onFinallyCallback(() -> {
+            LoadingBar.get().hide(canvas);
+            renderImageOnCanvas(textField);
         })).start();
     }
 
-    public void onTextChanged(String newText) {
-        this.imageName = newText;
+    public final void renderImageOnCanvas(JTextField textField) {
+        // Render in another Thread
+        String filename = textField.getText();
+        if (this.canvas != null && new File(filename).exists()) {
+            new Thread(() -> drawImageOnCanvas(filename)).start();
+        }
     }
 
-    public String fmtMessage(String msg) {
+    private String fmtMessage(String msg) {
         return String.format("Information:\n\n%s\n", msg);
     }
 
@@ -76,8 +84,39 @@ public class UIController {
         return String.format("Error:\n\n%s\n", err.getMessage());
     }
 
-    public void setCanvasRef(Canvas canvas) {
+    private void drawImageOnCanvas(String imageName) {
+        try {
+            java.awt.Image img = ImageIO.read(new File(imageName));
+            Graphics2D g = (Graphics2D) this.canvas.getGraphics();
+            g.drawImage(img, 0, 0, canvas);
+        } catch (IOException ex) {
+            ex.printStackTrace(System.out);
+        }
+    }
+
+    public final UIController setCanvasRef(Canvas canvas) {
         this.canvas = canvas;
+        return this;
+    }
+
+    private static class ImageFilter extends FileFilter {
+
+        @Override
+        public boolean accept(File f) {
+            if (f.isDirectory()) {
+                return true;
+            }
+            String extension = Files.getExtension(f);
+            if (extension != null) {
+                return Arrays.asList(Files.PNG, Files.JPG, Files.JPEG).contains(extension);
+            }
+            return false;
+        }
+
+        @Override
+        public String getDescription() {
+            return "Images";
+        }
     }
 
     public static final UIController get() {
@@ -90,16 +129,6 @@ public class UIController {
     private static synchronized void instantiate() {
         if (instance == null) {
             instance = new UIController();
-        }
-    }
-
-    private void drawImageOnCanvas() {
-        try {
-            java.awt.Image img = ImageIO.read(new File(imageName));
-            Graphics2D g = (Graphics2D) this.canvas.getGraphics();
-            g.drawImage(img, 0, 0, canvas);
-        } catch (IOException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

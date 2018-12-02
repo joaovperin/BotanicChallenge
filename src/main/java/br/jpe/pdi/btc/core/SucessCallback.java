@@ -18,9 +18,11 @@ package br.jpe.pdi.btc.core;
 
 /**
  * Callback
+ *
+ * @param <T>
  */
-public interface SucessCallback {
+public interface SucessCallback<T> {
 
-    public void run(String data);
+    public void run(T data);
 
 }
