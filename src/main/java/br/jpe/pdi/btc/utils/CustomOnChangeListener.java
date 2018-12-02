@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Perin
+ * Copyright (C) 2018 BotanicChallenge
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.jpe.pdi.btc.core;
+package br.jpe.pdi.btc.utils;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- * Document Eventt Listener
+ * A custom On Change Event Listener
  */
-public class DocListenerImpl implements DocumentListener {
+public class CustomOnChangeListener implements DocumentListener {
 
     private final Runnable runnable;
 
-    public DocListenerImpl(Runnable runnable) {
+    public CustomOnChangeListener(Runnable runnable) {
         this.runnable = runnable;
     }
 

@@ -16,7 +16,7 @@
  */
 package br.jpe.pdi.btc.gui;
 
-import br.jpe.pdi.btc.core.DocListenerImpl;
+import br.jpe.pdi.btc.utils.CustomOnChangeListener;
 import br.jpe.pdi.btc.core.UIController;
 
 /**
@@ -149,8 +149,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         jTextFieldImageSelector.getDocument().addDocumentListener(
-                new DocListenerImpl(() -> UIController.get().onTextChanged(jTextFieldImageSelector.getText()))
+                new CustomOnChangeListener(() -> UIController.get().onTextChanged(jTextFieldImageSelector.getText()))
         );
+        jTextFieldImageSelector.setText("D:/Programacao/Projetos/x/BotanicChallenge/res/leaf_1.png");
     }//GEN-LAST:event_formWindowOpened
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

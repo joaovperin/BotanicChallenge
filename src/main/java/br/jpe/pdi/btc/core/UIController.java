@@ -34,7 +34,7 @@ public class UIController {
     }
 
     public final void onClickGo() {
-        System.out.println("*** Processing image: " + imageName);
+        new Thread(new ImageGatherRunnable(imageName)).start();
     }
 
     public void onTextChanged(String newText) {

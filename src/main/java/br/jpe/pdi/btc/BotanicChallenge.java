@@ -16,7 +16,7 @@
  */
 package br.jpe.pdi.btc;
 
-import br.jpe.pdi.btc.core.Systems;
+import br.jpe.pdi.btc.utils.Systems;
 import br.jpe.pdi.btc.gui.MainFrame;
 import javax.swing.UIManager;
 

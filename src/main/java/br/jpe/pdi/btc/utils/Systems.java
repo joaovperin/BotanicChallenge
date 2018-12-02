@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package br.jpe.pdi.btc.core;
+package br.jpe.pdi.btc.utils;
 
 import java.security.AccessController;
 import sun.awt.OSInfo;
