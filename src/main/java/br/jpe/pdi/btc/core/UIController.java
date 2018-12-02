@@ -16,6 +16,10 @@
  */
 package br.jpe.pdi.btc.core;
 
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 /**
  * UI Controller
  */
@@ -30,15 +34,36 @@ public class UIController {
     }
 
     public final void onClickOpenFileBrowser() {
-        System.out.println("*** Openning browser for image: " + imageName);
+        JFileChooser jFileChooser = new javax.swing.JFileChooser();
+        jFileChooser.setFileFilter(new ImageFilter());
+        jFileChooser.setVisible(true);
+        jFileChooser.setCurrentDirectory(new File(imageName)); // ChangeTo: System.getProperty("user.home")
+
+        int returnVal = jFileChooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            this.imageName = jFileChooser.getSelectedFile().toString();
+        }
     }
 
     public final void onClickGo() {
-        new Thread(new ImageGatherRunnable(imageName)).start();
+        new Thread(new ImageGatherRunnable(imageName).onSucessCallback((String msg) -> {
+            JOptionPane.showMessageDialog(null, fmtMessage(msg), "Information!", JOptionPane.INFORMATION_MESSAGE);
+        }).onErrorCallback((Exception err) -> {
+            JOptionPane.showMessageDialog(null, fmtError(err), "Error!", JOptionPane.ERROR_MESSAGE);
+            err.printStackTrace(System.out);
+        })).start();
     }
 
     public void onTextChanged(String newText) {
         this.imageName = newText;
+    }
+
+    public String fmtMessage(String msg) {
+        return String.format("Information:\n\n%s\n", msg);
+    }
+
+    private String fmtError(Exception err) {
+        return String.format("Error:\n\n%s\n", err.getMessage());
     }
 
     public static final UIController get() {

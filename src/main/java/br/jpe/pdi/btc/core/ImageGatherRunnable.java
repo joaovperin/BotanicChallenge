@@ -31,8 +31,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * An image info-gathering runnable
@@ -40,6 +38,8 @@ import java.util.logging.Logger;
 public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
 
     private final String filename;
+    private SucessCallback onSucessCallback;
+    private ErrorCallback onErrorCallback;
 
     public ImageGatherRunnable(String filename) {
         this.filename = filename;
@@ -47,17 +47,21 @@ public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
 
     @Override
     public void run() {
-        System.out.println(gatherInfo().toString());
+        try {
+            ImageInfo info = gatherInfo();
+            if (onSucessCallback != null) {
+                onSucessCallback.run(getReturnMessage(info));
+            }
+        } catch (Exception e) {
+            if (onErrorCallback != null) {
+                onErrorCallback.run(e);
+            }
+        }
     }
 
-    private ImageInfo gatherInfo() {
+    private ImageInfo gatherInfo() throws IOException {
         // Load image
-        Image imgOriginal = null;
-        try {
-            imgOriginal = loadImage(filename);
-        } catch (IOException ex) {
-            Logger.getLogger(ImageGatherRunnable.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Image imgOriginal = loadImage(filename);
 
         // Minimum area to be considered a block
         final int MIN_AREA = 400;
@@ -127,6 +131,28 @@ public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
             return ImageLoader.fromResources(filename).asOriginal();
         }
         throw new FileNotFoundException("Image not found!");
+    }
+
+    private String getReturnMessage(ImageInfo info) {
+        StringBuilder sb = new StringBuilder();
+        int numFungos = info.toString().split("\n").length;
+        sb.append("Numero de fungos: ").append(numFungos).append('\n');
+        sb.append("Tratamento: ").append(getTratamento(numFungos)).append('\n');
+        return sb.toString();
+    }
+
+    public final ImageGatherRunnable onSucessCallback(SucessCallback onSucessCallback) {
+        this.onSucessCallback = onSucessCallback;
+        return this;
+    }
+
+    public final ImageGatherRunnable onErrorCallback(ErrorCallback callback) {
+        this.onErrorCallback = callback;
+        return this;
+    }
+
+    private String getTratamento(int numFungos) {
+        return "" + numFungos;
     }
 
 }
