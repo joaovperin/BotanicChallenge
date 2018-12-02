@@ -71,7 +71,8 @@ public class UIController {
     public final void renderImageOnCanvas(JTextField textField) {
         // Render in another Thread
         String filename = textField.getText();
-        if (this.canvas != null && new File(filename).exists()) {
+        File file = new File(filename);
+        if (this.canvas != null && file.exists() && file.isFile()) {
             new Thread(() -> drawImageOnCanvas(filename)).start();
         }
     }
