@@ -23,7 +23,6 @@ import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
@@ -87,8 +86,9 @@ public class UIController {
 
     private void drawImageOnCanvas(String imageName) {
         try {
-            java.awt.Image img = ImageIO.read(new File(imageName));
             Graphics2D g = (Graphics2D) this.canvas.getGraphics();
+            java.awt.Image img = ImageIO.read(new File(imageName));
+            g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
             g.drawImage(img, 0, 0, canvas);
         } catch (IOException ex) {
             ex.printStackTrace(System.out);
@@ -107,16 +107,12 @@ public class UIController {
             if (f.isDirectory()) {
                 return true;
             }
-            String extension = Files.getExtension(f);
-            if (extension != null) {
-                return Arrays.asList(Files.PNG, Files.JPG, Files.JPEG).contains(extension);
-            }
-            return false;
+            return Files.isImage(f);
         }
 
         @Override
         public String getDescription() {
-            return "Images";
+            return "Images (jpg, jpeg, png)";
         }
     }
 

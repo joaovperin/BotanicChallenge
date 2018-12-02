@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * File utils
@@ -49,11 +50,14 @@ public class Files {
     public static Image loadImage(String filename) throws IOException {
         // Checks file name
         if (filename == null || filename.trim().isEmpty()) {
-            throw new FileNotFoundException("Image not found!");
+            throw new FileNotFoundException("File not found!");
         }
         // Checks file exists
         File file = new File(filename);
         if (file.exists()) {
+            if (!isImage(file)) {
+                throw new FileNotFoundException("Not an image!");
+            }
             return ImageLoader.fromFile(file).asOriginal();
         }
         // Get the image as a resource
@@ -62,6 +66,16 @@ public class Files {
             return ImageLoader.fromResources(filename).asOriginal();
         }
         throw new FileNotFoundException("Image not found!");
+    }
+
+    public static boolean isImage(File f) {
+        if (!f.isDirectory()) {
+            String extension = getExtension(f);
+            if (extension != null) {
+                return Arrays.asList(Files.PNG, Files.JPG, Files.JPEG).contains(extension);
+            }
+        }
+        return false;
     }
 
 }

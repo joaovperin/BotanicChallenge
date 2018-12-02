@@ -51,7 +51,15 @@ public class BotanicChallenge {
     private static void startGraphicalUserInterfaceApplication() throws Exception {
         final String lookAndFeel = Systems.isWindows()
                 ? "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel"
-                : "javax.swing.plaf.metal.MetalLookAndFeel";
+                : "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+        /*
+        -> Available LookAndFeels:
+        javax.swing.plaf.metal.MetalLookAndFeel
+        javax.swing.plaf.nimbus.NimbusLookAndFeel
+        com.sun.java.swing.plaf.motif.MotifLookAndFeel
+        com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+        com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel
+         */
         UIManager.setLookAndFeel(lookAndFeel);
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
