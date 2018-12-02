@@ -16,7 +16,12 @@
  */
 package br.jpe.pdi.btc.core;
 
+import br.jpe.ipl.core.Image;
+import br.jpe.ipl.core.ImageLoader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * File utils
@@ -39,6 +44,24 @@ public class Utils {
             ext = s.substring(i + 1).toLowerCase();
         }
         return ext;
+    }
+
+    public static Image loadImage(String filename) throws IOException {
+        // Checks file name
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new FileNotFoundException("Image not found!");
+        }
+        // Checks file exists
+        File file = new File(filename);
+        if (file.exists()) {
+            return ImageLoader.fromFile(file).asOriginal();
+        }
+        // Get the image as a resource
+        InputStream resourceImg = Utils.class.getClassLoader().getResourceAsStream(filename);
+        if (resourceImg != null) {
+            return ImageLoader.fromResources(filename).asOriginal();
+        }
+        throw new FileNotFoundException("Image not found!");
     }
 
 }

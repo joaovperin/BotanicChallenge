@@ -22,14 +22,10 @@ import br.jpe.ipl.core.ImageColor;
 import br.jpe.ipl.core.ImageInfo;
 import br.jpe.ipl.core.ImageInfoConstants;
 import br.jpe.ipl.core.ImageInfoExtractor;
-import br.jpe.ipl.core.ImageLoader;
 import br.jpe.ipl.core.ImagePoint;
 import br.jpe.ipl.core.scripts.image.BinaryLabelingScript;
 import br.jpe.ipl.core.scripts.image.extraction.PixelCountExtractionScript;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -61,7 +57,7 @@ public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
 
     private ImageInfo gatherInfo() throws IOException {
         // Load image
-        Image imgOriginal = loadImage(filename);
+        Image imgOriginal = Utils.loadImage(filename);
 
         // Minimum area to be considered a block
         final int MIN_AREA = 400;
@@ -113,24 +109,6 @@ public class ImageGatherRunnable implements Runnable, ImageInfoConstants {
         int min = target - tValue;
         int max = target + tValue;
         return (pValue >= min && pValue <= max);
-    }
-
-    private Image loadImage(String filename) throws IOException {
-        // Checks file name
-        if (filename == null || filename.trim().isEmpty()) {
-            throw new FileNotFoundException("Image not found!");
-        }
-        // Checks file exists
-        File file = new File(filename);
-        if (file.exists()) {
-            return ImageLoader.fromFile(file).asOriginal();
-        }
-        // Get the image as a resource
-        InputStream resourceImg = getClass().getClassLoader().getResourceAsStream(filename);
-        if (resourceImg != null) {
-            return ImageLoader.fromResources(filename).asOriginal();
-        }
-        throw new FileNotFoundException("Image not found!");
     }
 
     private String getReturnMessage(ImageInfo info) {

@@ -151,7 +151,8 @@ public class MainFrame extends javax.swing.JFrame {
         jTextFieldImageSelector.getDocument().addDocumentListener(
                 new CustomOnChangeListener(() -> UIController.get().onTextChanged(jTextFieldImageSelector.getText()))
         );
-        jTextFieldImageSelector.setText("D:/Programacao/Projetos/x/BotanicChallenge/res/leaf_1.png");
+        jTextFieldImageSelector.setText("D:/Programacao/Projetos/x/BotanicChallenge/res/leaf_1.png"); // ChangeTo: System.getProperty("user.home")
+        //UIController.get().setCanvasRef(canvas);
     }//GEN-LAST:event_formWindowOpened
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

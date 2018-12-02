@@ -16,7 +16,13 @@
  */
 package br.jpe.pdi.btc.core;
 
+import java.awt.Canvas;
+import java.awt.Graphics2D;
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -28,6 +34,7 @@ public class UIController {
     private static UIController instance;
 
     private String imageName;
+    private Canvas canvas;
 
     private UIController() {
         this.imageName = "";
@@ -37,11 +44,14 @@ public class UIController {
         JFileChooser jFileChooser = new javax.swing.JFileChooser();
         jFileChooser.setFileFilter(new ImageFilter());
         jFileChooser.setVisible(true);
-        jFileChooser.setCurrentDirectory(new File(imageName)); // ChangeTo: System.getProperty("user.home")
+        jFileChooser.setCurrentDirectory(new File(imageName));
 
         int returnVal = jFileChooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             this.imageName = jFileChooser.getSelectedFile().toString();
+            if (this.canvas != null) {
+                drawImageOnCanvas();
+            }
         }
     }
 
@@ -66,6 +76,10 @@ public class UIController {
         return String.format("Error:\n\n%s\n", err.getMessage());
     }
 
+    public void setCanvasRef(Canvas canvas) {
+        this.canvas = canvas;
+    }
+
     public static final UIController get() {
         if (instance == null) {
             instantiate();
@@ -76,6 +90,16 @@ public class UIController {
     private static synchronized void instantiate() {
         if (instance == null) {
             instance = new UIController();
+        }
+    }
+
+    private void drawImageOnCanvas() {
+        try {
+            java.awt.Image img = ImageIO.read(new File(imageName));
+            Graphics2D g = (Graphics2D) this.canvas.getGraphics();
+            g.drawImage(img, 0, 0, canvas);
+        } catch (IOException ex) {
+            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
