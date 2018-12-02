@@ -35,12 +35,32 @@ public class LoadingBar {
 
     private static final int BWIDTH = 400;
     private static final int BHEIGHT = 120;
+    private static final int BAR_HEIGHT = 13;
+    private static final int SLEEP_TIME = 12;
     private static final String LOADING = "Loading...";
 
     // Bounding box
     private Rectangle bb = null;
+    private Font font;
 
-    public void show(Canvas canvas) {
+    private long timePassed;
+
+    private synchronized void render(Graphics2D g) {
+        if (bb == null) {
+            return;
+        }
+        // Calculate the ease using a sin curve
+        float sin = (float) Math.sin(Math.toRadians(timePassed));
+        int x = Math.round(Math.abs(sin) * BWIDTH);
+        // Clear the rect
+        g.setColor(Color.BLACK);
+        g.fillRect(bb.x + x, bb.y + BHEIGHT - BAR_HEIGHT, BWIDTH - x, BAR_HEIGHT);
+        // Paint what's left
+        g.setColor(Color.RED);
+        g.fillRect(bb.x, bb.y + BHEIGHT - BAR_HEIGHT, x, BAR_HEIGHT);
+    }
+
+    public synchronized void show(Canvas canvas) {
         Graphics2D g = (Graphics2D) canvas.getGraphics();
         if (bb != null) {
             return;
@@ -50,21 +70,32 @@ public class LoadingBar {
         int cH = canvas.getHeight();
         bb = new Rectangle((cW - BWIDTH) / 2, (cH - BHEIGHT) / 2, BWIDTH, BHEIGHT);
 
-        g.setColor(Color.BLACK);
-        g.fillRect(bb.x, bb.y, bb.width, bb.height);
-
-        Font font = new Font("Serif", Font.PLAIN, 96);
+        font = new Font("Serif", Font.PLAIN, 96);
 
         float dx = BWIDTH / 2 - (LOADING.length() * font.getSize()) / 5;
         float dy = (bb.height + font.getSize() / 2) / 2;
-
+        // Draws the 'Loading' text
+        g.setColor(Color.BLACK);
+        g.fillRect(bb.x, bb.y, bb.width, bb.height);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(font);
         g.setColor(Color.WHITE);
         g.drawString(LOADING, bb.x + dx, bb.y + dy);
+        // Draws the loading bar loop (in a thread)
+        new Thread(() -> {
+            timePassed = 0;
+            while (bb != null) {
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                    render(g);
+                    timePassed++;
+                } catch (InterruptedException ex) {
+                }
+            }
+        }).start();
     }
 
-    public void hide(Canvas canvas) {
+    public synchronized void hide(Canvas canvas) {
         Graphics2D g = (Graphics2D) canvas.getGraphics();
         if (bb == null) {
             return;
