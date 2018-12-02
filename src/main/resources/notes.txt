@@ -1,0 +1,30 @@
+# Notes
+
+Just a file to keep some personal notes. Decided to commit it since it will be 
+available online.
+
+
+## Dependencies for Swing Browsers: 
+`        <dependency>
+            <groupId>net.sf.cssbox</groupId>
+            <artifactId>cssbox</artifactId>
+            <version>4.14</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.cssbox</groupId>
+            <artifactId>swingbox</artifactId>
+            <version>1.1</version>
+        </dependency>
+`
+
+## Weird and funny loading bar I made by mistake :P
+`       float sin = (float) Math.sin(Math.toRadians(timePassed));
+        int y = (int) (sin * BHEIGHT);
+        float cos = (float) Math.sin(Math.toRadians(timePassed));
+        int x = (int) (cos * BWIDTH);
+
+        g.setColor(Color.RED);
+        g.drawOval(bb.x + x / 2, bb.y - y / 2, BWIDTH - x, BHEIGHT - y);
+`
+## Images samples directory (on my PC):
+D:\Samples\leaf_1.png
