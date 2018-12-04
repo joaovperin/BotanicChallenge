@@ -1,2 +1,3 @@
-#!/bin/bash
-java -cp ImageProcessLib.jar;BotanicChallenge.jar br.jpe.pdi.btc.BotanicChallenge
+#! /bin/bash
+java -cp "BotanicChallenge.jar:ImageProcessLib.jar" br.jpe.pdi.btc.BotanicChallenge
+
