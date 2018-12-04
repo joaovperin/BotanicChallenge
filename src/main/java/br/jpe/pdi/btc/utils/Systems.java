@@ -16,9 +16,6 @@
  */
 package br.jpe.pdi.btc.utils;
 
-import java.security.AccessController;
-import sun.awt.OSInfo;
-
 /**
  * Utilities to work with the SO
  *
@@ -27,11 +24,11 @@ import sun.awt.OSInfo;
 public class Systems {
 
     public static boolean isWindows() {
-        return getOs().equals(OSInfo.OSType.WINDOWS);
+        return getOs().trim().toLowerCase().contains("windows");
     }
 
-    private static OSInfo.OSType getOs() {
-        return AccessController.doPrivileged(OSInfo.getOSTypeAction());
+    private static String getOs() {
+        return System.getProperty("os.name");
     }
 
 }

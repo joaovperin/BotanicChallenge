@@ -22,18 +22,16 @@ import br.jpe.ipl.core.ImageBuilder;
 import br.jpe.ipl.core.ImageColor;
 import br.jpe.ipl.core.ImageInfo;
 import br.jpe.ipl.core.ImageInfoConstants;
-import br.jpe.ipl.core.ImageInfoExtractor;
-import br.jpe.ipl.core.ImagePoint;
 import br.jpe.ipl.core.scripts.image.BinaryLabelingScript;
-import br.jpe.ipl.core.scripts.image.extraction.PixelCountExtractionScript;
+import br.jpe.ipl.core.scripts.image.convolution.DilationMorphScript;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * An image info-gathering runnable
  */
 public class ImageGatherRunnable extends AsyncTask implements ImageInfoConstants {
 
+    private static final int MIN_AREA = 20;
     private final String filename;
 
     public ImageGatherRunnable(String filename) {
@@ -46,53 +44,16 @@ public class ImageGatherRunnable extends AsyncTask implements ImageInfoConstants
         return getReturnMessage(info);
     }
 
-    private ImageInfo gatherInfo() throws IOException {
-        // Load image
+    public final ImageInfo gatherInfo() throws IOException {
         Image imgOriginal = Files.loadImage(filename);
 
-        // Minimum area to be considered a block
-        final int MIN_AREA = 400;
-
-        // Process
+        // Checks if  32 > RED < 196, 21 > Green < 51 AND 18 > Blue < 46
         BinaryLabelingScript binaryLabeler = new BinaryLabelingScript(ImageColor.black(), MIN_AREA, true);
-        Image newImage = ImageBuilder.create(imgOriginal).
-                applyScript((mtz, c, i, j) -> {
-                    int r = c.getRed();
-                    int g = c.getGreen();
-                    int b = c.getBlue();
-
-                    int v = 0; // defaults black
-                    // Wine or Copper red
-                    if (isBetween(r, 114, 72) && isBetween(g, 36, 43) && isBetween(b, 32, 45)
-                            || isBetween(r, 216, 71) && isBetween(g, 109, 43) && isBetween(b, 93, 45)) {
-                        v = 255;
-                    }
-                    // LightBrown
-                    if (isBetween(r, 142, 30) && isBetween(g, 132, 22) && isBetween(b, 96, 22)) {
-                        v = 0;
-                    }
-                    // DarkBrown
-                    if (isBetween(r, 115, 30) && isBetween(g, 89, 22) && isBetween(b, 76, 22)) {
-                        v = 0;
-                    }
-
-                    for (int k = 0; k < 3; k++) {
-                        mtz[i][j][k] = v;
-                    }
-                }).
-                applyScript(binaryLabeler).
-                build();
-
-        // Gather INFO
-        ImageInfo info = ImageInfo.create();
-        Map<ImageColor, ImagePoint> colors = binaryLabeler.getColors();
-        colors.forEach((ImageColor k, ImagePoint v) -> {
-            final int pCnt = ImageInfoExtractor.create(newImage.getMatrix()).
-                    applyScript(new PixelCountExtractionScript(k)).
-                    extract().getInt(PIXEL_COUNT);
-            info.put(PIXEL_COUNT + "_" + k, pCnt);
-        });
-        return info;
+        ImageBuilder.create(imgOriginal).transform((r, g, b)
+                -> ((isBetween(r, 114, 72) && isBetween(g, 36, 43) && isBetween(b, 32, 45)) ? 255 : 0))
+                .applyScript(2, new DilationMorphScript()).
+                build(binaryLabeler);
+        return ImageInfo.create().put(PIXEL_COUNT, binaryLabeler.getColors().size());
     }
 
     private static boolean isBetween(int pValue, int target, int tolerance) {
@@ -104,14 +65,23 @@ public class ImageGatherRunnable extends AsyncTask implements ImageInfoConstants
 
     private String getReturnMessage(ImageInfo info) {
         StringBuilder sb = new StringBuilder();
-        int numFungos = info.toString().split("\n").length;
-        sb.append("Numero de fungos: ").append(numFungos).append('\n');
-        sb.append("Tratamento: ").append(getTratamento(numFungos)).append('\n');
+        int numManchas = info.getInt(PIXEL_COUNT);
+        sb.append("Numero de manchas: ").append(numManchas).append('\n');
+        sb.append("Tratamento: ").append(getTratamento(numManchas)).append('\n');
         return sb.toString();
     }
 
-    private String getTratamento(int numFungos) {
-        return "" + numFungos;
+    private String getTratamento(int numManchas) {
+        if (numManchas == 1) {
+            return "Mancha INICIAL.\nTratamento: Chá de alho";
+        }
+        if (numManchas == 2 || numManchas == 3) {
+            return "Mancha MÉDIA.\nTratamento: Pó de calcário dissolvido em 1L de água";
+        }
+        if (numManchas > 3) {
+            return "Mancha GRAVE.\nTratamento: Não possui. Você deve arrancar a folha e pulverizar a planta com Aerosol anti-ferrugem botânica";
+        }
+        return "Parabéns! A folha analisada não possui problemas de ferrugem";
     }
 
 }

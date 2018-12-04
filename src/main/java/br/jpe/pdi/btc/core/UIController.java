@@ -55,6 +55,9 @@ public class UIController {
     }
 
     public final void onClickGo(JTextField textField) {
+        if (!isImageValid(new File(textField.getText()))) {
+            return;
+        }
         LoadingBar.get().show(canvas);
         new Thread(new ImageGatherRunnable(textField.getText()).onSucessCallback((SucessCallback<String>) (String data) -> {
             MessageDialog.get().showInfo(fmtMessage(data));
@@ -71,7 +74,7 @@ public class UIController {
         // Render in another Thread
         String filename = textField.getText();
         File file = new File(filename);
-        if (this.canvas != null && file.exists() && file.isFile()) {
+        if (this.canvas != null && isImageValid(file)) {
             new Thread(() -> drawImageOnCanvas(filename)).start();
         }
     }
@@ -98,6 +101,10 @@ public class UIController {
     public final UIController setCanvasRef(Canvas canvas) {
         this.canvas = canvas;
         return this;
+    }
+
+    private static boolean isImageValid(File file) {
+        return file.exists() && file.isFile();
     }
 
     private static class ImageFilter extends FileFilter {
